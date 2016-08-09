@@ -108,10 +108,10 @@ Hack.class的引用，hack.class在独立的dex文件中，那么a.class的标�
 
 
  
-####<a href="https://github.com/dodola/RocooFix">https://github.com/dodola/RocooFix</a> 实现了上面方案的开源库
- 
+###<a href="https://github.com/dodola/RocooFix">https://github.com/dodola/RocooFix</a> 实现了上面方案的开源库
+
+####rocoo 解决类加载问题核心代码
 ```
-rocoo 解决类加载问题核心代码
    Field pathListField = RocooUtils.findField(loader, "pathList");
             Object dexPathList = pathListField.get(loader);
             Field dexElement = RocooUtils.findField(dexPathList, "dexElements");
@@ -129,9 +129,8 @@ rocoo 解决类加载问题核心代码
             RocooUtils.expandFieldArray(dexPathList, "dexElements", newEles);
 ```
 
-
+####rocoofix 插件，解决CLASS_ISPREVERIFIED 问题 核心代码
 ```
-rocoofix 插件，解决CLASS_ISPREVERIFIED 问题 核心代码
 v.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/Boolean", "FALSE", "Ljava/lang/Boolean;");
         v.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false);
         v.visitJumpInsn(Opcodes.IFEQ, l1);
