@@ -1,2 +1,2 @@
 # shoyu666.github.io
-shoyu666.github.io
+https://shoyu666.github.io/
