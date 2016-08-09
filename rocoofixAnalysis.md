@@ -83,10 +83,11 @@ if (!fromUnverifiedConstant &&
             }
         }
 
-解决办法：防止类被打上CLASS_ISPREVERIFIED标签
-
-1：那么类是什么时候被打上CLASS_ISPREVERIFIED标签的
-https://android.googlesource.com/platform/dalvik/+/froyo-release/vm/analysis/DexVerify.c
+```
+<br>解决办法：防止类被打上CLASS_ISPREVERIFIED标签
+<br>1：那么类是什么时候被打上CLASS_ISPREVERIFIED标签的
+<br>https://android.googlesource.com/platform/dalvik/+/froyo-release/vm/analysis/DexVerify.c
+```
 if (dvmVerifyClass(clazz, VERIFY_DEFAULT)) {
     //校验通过则写入CLASS_ISPREVERIFIED标签
                     assert((clazz->accessFlags & JAVA_FLAGS_MASK) ==
