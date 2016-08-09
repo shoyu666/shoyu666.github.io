@@ -1,188 +1,48 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html>
+
   <head>
-    <meta charset="UTF-8">
-    <title>rocoofix原理 by shoyu666</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="学习笔记 : shoyu666笔记">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>学习笔记</title>
   </head>
+
   <body>
-    <section class="page-header">
-      <h1 class="project-name">rocoofix原理</h1>
-      <h2 class="project-tagline">笔记</h2>
-    </section>
 
-    <section class="main-content">
-      <table>
-<thead>
-<tr>
-<th>class.dex</th>
-<th>class1.dex</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>a.class</td>
-<td>d.class</td>
-</tr>
-<tr>
-<td>b.class[有bug]</td>
-<td>e.class</td>
-</tr>
-<tr>
-<td>c.class</td>
-<td>f.class</td>
-</tr>
-<tr>
-<td>....</td>
-<td>...</td>
-</tr>
-</tbody>
-</table>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/shoyu666">View on GitHub</a>
 
-<p>1：下面分析android是如何加载class的，比如b.class</p>
+          <h1 id="project_title">学习笔记</h1>
+          <h2 id="project_tagline">shoyu666笔记</h2>
 
-<blockquote>
-<p>核心代码
-<a href="https://android.googlesource.com/platform/libcore-snapshot/+/ics-mr1/dalvik/src/main/java/dalvik/system/DexPathList.java">https://android.googlesource.com/platform/libcore-snapshot/+/ics-mr1/dalvik/src/main/java/dalvik/system/DexPathList.java</a></p>
-</blockquote>
+        </header>
+    </div>
 
-<pre><code>  public Class findClass(String name) {
-        //dexElements [class.dex,class1.dex.....]
-        for (Element element : dexElements) {
-            DexFile dex = element.dexFile;
-            if (dex != null) {
-                Class clazz = dex.loadClassBinaryName(name, definingContext);
-                if (clazz != null) {
-                    return clazz;
-                }
-            }
-        }
-        return null;
-    }
-    //可以看到是按照dexElements数组里面的dex文件顺序循环，第一个成功找到并返回
-</code></pre>
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="学习整理httpsshoyu666githubio" class="anchor" href="#%E5%AD%A6%E4%B9%A0%E6%95%B4%E7%90%86httpsshoyu666githubio" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>学习整理<a href="https://shoyu666.github.io/">https://shoyu666.github.io/</a>
+</h1>
 
-<p>那么我们hack上面这个查找过程，新增补丁dex
-补丁.dex |class.dex |class1.dex |
----|---|---
-无 |a.class |d.class |
-b.class[补丁]  |b.class[有bug] |e.class|
-无  |c.class |f.class|
-无 |...|</p>
+<p>1:rocoofix原理分析</p>
+      </section>
+    </div>
 
-<pre><code>        ....
-  //dexElements [补丁.dex,class.dex,class1.dex.....]
-  //加入补丁.dex，并放到数组最前面，那么就会首先查找补丁.dex的类
-        for (Element element : dexElements) {
-        ....
-</code></pre>
-
-<p>2：成功插入了补丁的class,但是下面的情况会出问题</p>
-
-<pre><code>报错：java.lang.IllegalAccessError: Class ref in pre-verified class
-场景：c.class调用b.class
-现在是 c.class[class.dex]----&gt;b.class[补丁.dex]  不同dex中，报错
-原先是c.class[class.dex]----&gt;b.class[class.dex]  同一个dex中,不报错
-</code></pre>
-
-<pre><code>错误原因：被打上CLASS_ISPREVERIFIED标签的类会进行校验。
-报错源代码：
-https://android.googlesource.com/platform/dalvik.git/+/51801371a9b0f829303d326a2300518177dde3e8/vm/oo/Resolve.cpp
-if (!fromUnverifiedConstant &amp;&amp;
-            IS_CLASS_FLAG_SET(referrer, CLASS_ISPREVERIFIED))
-        {
-            ClassObject* resClassCheck = resClass;
-            if (dvmIsArrayClass(resClassCheck))
-                resClassCheck = resClassCheck-&gt;elementClass;
-            if (referrer-&gt;pDvmDex != resClassCheck-&gt;pDvmDex &amp;&amp;
-                resClassCheck-&gt;classLoader != NULL)
-            {
-                ALOGW("Class resolved by unexpected DEX:"
-                     " %s(%p):%p ref [%s] %s(%p):%p",
-                    referrer-&gt;descriptor, referrer-&gt;classLoader,
-                    referrer-&gt;pDvmDex,
-                    resClass-&gt;descriptor, resClassCheck-&gt;descriptor,
-                    resClassCheck-&gt;classLoader, resClassCheck-&gt;pDvmDex);
-                ALOGW("(%s had used a different %s during pre-verification)",
-                    referrer-&gt;descriptor, resClass-&gt;descriptor);
-                dvmThrowIllegalAccessError(
-                    "Class ref in pre-verified class resolved to unexpected "
-                    "implementation");
-                return NULL;
-            }
-        }
-
-解决办法：防止类被打上CLASS_ISPREVERIFIED标签
-
-1：那么类是什么时候被打上CLASS_ISPREVERIFIED标签的
-https://android.googlesource.com/platform/dalvik/+/froyo-release/vm/analysis/DexVerify.c
-if (dvmVerifyClass(clazz, VERIFY_DEFAULT)) {
-    //校验通过则写入CLASS_ISPREVERIFIED标签
-                    assert((clazz-&gt;accessFlags &amp; JAVA_FLAGS_MASK) ==
-                        pClassDef-&gt;accessFlags);
-                    ((DexClassDef*)pClassDef)-&gt;accessFlags |=
-                        CLASS_ISPREVERIFIED;//加入标签
-                }
-
-2：如何防止被打上标签
-原理：让校验不通过
-如果a.class 引用了不在同一个dex文件中的class,那么a.class就不会有CLASS_ISPREVERIFIED
-上面c.class开始和b.class在同一个dex,所以c.class被打上标签
- 后面补丁的b.class和c.class不在同一个dex,所以报错，为了解决这个问题
- 我们要事先就要防止a.class被打上标签
-
-3 方法：
-使用gralde插件，编译阶段在a.class的构造函数中插入(通过字节码修改库asm)
-Hack.class的引用，hack.class在独立的dex文件中，那么a.class的标签就不会打上
-</code></pre>
-
-<pre><code>https://github.com/dodola/RocooFix 实现了上面方案的开源库
-</code></pre>
-
-<pre><code>rocoo 解决类加载问题核心代码
-   Field pathListField = RocooUtils.findField(loader, "pathList");
-            Object dexPathList = pathListField.get(loader);
-            Field dexElement = RocooUtils.findField(dexPathList, "dexElements");
-            Class&lt;?&gt; elementType = dexElement.getType().getComponentType();
-            Method loadDex = RocooUtils.findMethod(dexPathList, "loadDexFile", File.class, File.class, ClassLoader.class, dexElement.getType());
-            loadDex.setAccessible(true);
-
-            Object dex = loadDex.invoke(null, additionalClassPathEntries.get(0), optimizedDirectory, loader, dexElement.get(dexPathList));
-            Constructor&lt;?&gt; constructor = elementType.getConstructor(File.class, boolean.class, File.class, DexFile.class);
-            constructor.setAccessible(true);
-            Object element = constructor.newInstance(new File(""), false, additionalClassPathEntries.get(0), dex);
-
-            Object[] newEles = new Object[1];
-            newEles[0] = element;
-            RocooUtils.expandFieldArray(dexPathList, "dexElements", newEles);
-</code></pre>
-
-<pre><code>rocoofix 插件，解决CLASS_ISPREVERIFIED 问题 核心代码
-v.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/Boolean", "FALSE", "Ljava/lang/Boolean;");
-        v.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false);
-        v.visitJumpInsn(Opcodes.IFEQ, l1);
-        v.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
-        v.visitLdcInsn(Type.getType("Lcom/dodola/rocoo/Hack;"));
-        v.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/Object;)V", false);
-        v.visitLabel(l1);
-</code></pre>
-
-<pre><code>参考
-1空间的文章https://mp.weixin.qq.com/s?__biz=MzI1MTA1MzM2Nw==&amp;mid=400118620&amp;idx=1&amp;sn=b4fdd5055731290eef12ad0d17f39d4a&amp;scene=1&amp;srcid=1106Imu9ZgwybID13e7y2nEi#wechat_redirect  感谢qqzone
-2https://github.com/dodola/RocooFix 感谢dodola
-</code></pre>
-
-      <footer class="site-footer">
-
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
       </footer>
+    </div>
 
-    </section>
+    
 
-  
   </body>
 </html>
