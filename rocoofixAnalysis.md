@@ -27,6 +27,7 @@ c.class |f.class|
     //可以看到是按照dexElements数组里面的dex文件顺序循环，第一个成功找到并返回
 ```
 那么我们hack上面这个查找过程，新增补丁dex
+
 补丁.dex |class.dex |class1.dex |
 ---|---|---
 无 |a.class |d.class |
