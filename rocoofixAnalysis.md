@@ -107,9 +107,9 @@ Hack.class的引用，hack.class在独立的dex文件中，那么a.class的标�
 ```
 
 
-```
-https://github.com/dodola/RocooFix 实现了上面方案的开源库
-```
+ 
+####<a href="https://github.com/dodola/RocooFix">https://github.com/dodola/RocooFix</a> 实现了上面方案的开源库
+ 
 ```
 rocoo 解决类加载问题核心代码
    Field pathListField = RocooUtils.findField(loader, "pathList");
