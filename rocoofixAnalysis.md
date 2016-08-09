@@ -1,4 +1,7 @@
 
+
+> 假设如下dex
+
 class.dex |class1.dex |
 ---|---
 a.class |d.class |
@@ -137,3 +140,9 @@ v.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/Boolean", "FALSE", "Ljava/lang/Bo
         v.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/Object;)V", false);
         v.visitLabel(l1);
 ```
+
+
+
+> 参考
+<br>  <a href="https://mp.weixin.qq.com/s?__biz=MzI1MTA1MzM2Nw==&mid=400118620&idx=1&sn=b4fdd5055731290eef12ad0d17f39d4a&scene=1&srcid=1106Imu9ZgwybID13e7y2nEi#wechat_redirect">空间的文章<a/>  感谢qqzone的无私奉献
+<br>  <a href="https://github.com/dodola/RocooFix">RocooFix</a> 感谢dodola的无私奉献
