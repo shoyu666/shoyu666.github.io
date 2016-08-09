@@ -95,18 +95,18 @@ if (dvmVerifyClass(clazz, VERIFY_DEFAULT)) {
                     ((DexClassDef*)pClassDef)->accessFlags |=
                         CLASS_ISPREVERIFIED;//加入标签
                 }
-                
-2：如何防止被打上标签
-原理：让校验不通过
-如果a.class 引用了不在同一个dex文件中的class,那么a.class就不会有CLASS_ISPREVERIFIED
-上面c.class开始和b.class在同一个dex,所以c.class被打上标签
- 后面补丁的b.class和c.class不在同一个dex,所以报错，为了解决这个问题
- 我们要事先就要防止a.class被打上标签
+```                
+<br>2：如何防止被打上标签
+<br>原理：让校验不通过
+<br>如果a.class 引用了不在同一个dex文件中的class,那么a.class就不会有CLASS_ISPREVERIFIED
+<br>上面c.class开始和b.class在同一个dex,所以c.class被打上标签
+<br> 后面补丁的b.class和c.class不在同一个dex,所以报错，为了解决这个问题
+<br> 我们要事先就要防止a.class被打上标签
 
-3 方法：
-使用gralde插件，编译阶段在a.class的构造函数中插入(通过字节码修改库asm)
-Hack.class的引用，hack.class在独立的dex文件中，那么a.class的标签就不会打上
-```
+<br>3 方法：
+<br>使用gralde插件，编译阶段在a.class的构造函数中插入(通过字节码修改库asm)
+<br>Hack.class的引用，hack.class在独立的dex文件中，那么a.class的标签就不会打上
+
 
 
  
