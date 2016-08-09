@@ -54,10 +54,11 @@ b.class[补丁]  |b.class[有bug] |e.class|
 原先是c.class[class.dex]---->b.class[class.dex]  同一个dex中,不报错
 ```
 
+
+<br>错误原因：被打上CLASS_ISPREVERIFIED标签的类会进行校验。
+<br>报错源代码：
+<br>https://android.googlesource.com/platform/dalvik.git/+/51801371a9b0f829303d326a2300518177dde3e8/vm/oo/Resolve.cpp
 ```
-错误原因：被打上CLASS_ISPREVERIFIED标签的类会进行校验。
-报错源代码：
-https://android.googlesource.com/platform/dalvik.git/+/51801371a9b0f829303d326a2300518177dde3e8/vm/oo/Resolve.cpp
 if (!fromUnverifiedConstant &&
             IS_CLASS_FLAG_SET(referrer, CLASS_ISPREVERIFIED))
         {
