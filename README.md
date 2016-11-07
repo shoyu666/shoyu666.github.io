@@ -9,3 +9,4 @@
 ####<a href="https://github.com/shoyu666/shoyu666.github.io/blob/master/instantRun分析.md">8:instantRun分析</a>
 ####<a href="https://github.com/shoyu666/shoyu666.github.io/blob/master/Exopackage分析.md">9:Exopackage分析</a>
 ####<a href="https://github.com/shoyu666/shoyu666.github.io/blob/master/idea查看android源码.md">10:idea查看android源码</a>
+####<a href="http://bugly.qq.com/bbs/forum.php?mod=viewthread&tid=498">11:Android 开发绕不过的坑：你的 Bitmap 究竟占多大内存(转)</a>
