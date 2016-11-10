@@ -15,4 +15,6 @@ repo init -u https://android.googlesource.com/platform/manifest -b android-6.0.1
 
 $ repo sync
 repo sync -j8
+
+idea打开aosp\development\tools\idegen\idegen.ipr
 ```
